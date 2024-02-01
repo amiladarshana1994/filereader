@@ -1,9 +1,9 @@
 package com.epassi.filereader.util;
 
+import com.epassi.filereader.dto.ResponseDto;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
@@ -22,18 +22,18 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 public class FileProcessor {
-    Cache<String, JSONObject> cache = Caffeine.newBuilder().build();
+    Cache<String, ResponseDto> cache = Caffeine.newBuilder().build();
     private final Pattern CAPTURE_WORDS_REGEX = Pattern.compile("[^a-zA-Z]");
 
-    public JSONObject processFile(int k, String fileNameWithPath) {
+    public ResponseDto processFile(int k, String fileNameWithPath) {
         String fileChecksum = getChecksumOfFile(fileNameWithPath);
         String cacheIndex = fileChecksum.concat("_").concat(String.valueOf(k));
-        JSONObject ifPresent = cache.getIfPresent(cacheIndex);
+        ResponseDto ifPresent = cache.getIfPresent(cacheIndex);
         log.info("processFile : read file start {} {} fromCache {}", fileNameWithPath, k, ifPresent);
         return ifPresent != null ? ifPresent : processFileContinue(k, fileNameWithPath, cacheIndex);
     }
 
-    private JSONObject processFileContinue(int k, String fileNameWithPath, String cacheIndex) {
+    private ResponseDto processFileContinue(int k, String fileNameWithPath, String cacheIndex) {
         Map<String, Integer> countMap = new HashMap<>();
         try (BufferedReader br = Files.newBufferedReader(Paths.get(fileNameWithPath))) {
             br.lines()
@@ -42,20 +42,24 @@ public class FileProcessor {
                     .forEach(word -> countMap.merge(word, 1, Integer::sum));
         } catch (IOException e) {
             log.error("processFile : read file error", e);
-            return new JSONObject().put("error", "Failed to process the file!");
+            return ResponseDto.builder().message("Failed to process the file!").build();
         }
 
         Map<String, Integer> sortedMap = countMap.entrySet().stream()
                 .sorted((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
 
-        JSONObject result = new JSONObject(sortedMap.entrySet().stream()
-                .limit(k)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+        ResponseDto result = new ResponseDto("Success", collectResultMap(k, sortedMap));
         log.info("processFile : read file complete {} {} {}", fileNameWithPath, k, result);
         cache.put(cacheIndex, result);
         deleteFile(fileNameWithPath);
         return result;
+    }
+
+    private static Map<String, Integer> collectResultMap(int k, Map<String, Integer> sortedMap) {
+        return sortedMap.entrySet().stream()
+                .limit(k)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     public void deleteFile(String fileNameWithPath){

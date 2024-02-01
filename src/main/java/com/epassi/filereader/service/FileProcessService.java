@@ -1,9 +1,10 @@
 package com.epassi.filereader.service;
 
-import org.json.JSONObject;
+import com.epassi.filereader.dto.RequestDto;
+import com.epassi.filereader.dto.ResponseDto;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface FileProcessService {
-    String getCountOfTheFrequentWords(String request);
+    ResponseDto getCountOfTheFrequentWords(RequestDto request);
 }
