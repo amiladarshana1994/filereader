@@ -1,6 +1,5 @@
 package com.epassi.filereader.util;
 
-import com.epassi.filereader.dto.CacheIndex;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.extern.slf4j.Slf4j;
