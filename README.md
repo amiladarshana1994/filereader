@@ -1,4 +1,4 @@
-# Introduction..
+# Introduction.
 This is the back-end code repository for the REST API that takes a plain text file and find the top k most frequent words
 
 # Tech Stack
@@ -6,13 +6,16 @@ Java 17
 Spring Boot 3.2.2
 
 # How to start the application
-1. from IntelliJ IDEA
+1. Download the repo
+   https://github.com/amiladarshana1994/filereader.git
+
+2. open from IntelliJ IDEA
 
    go to the main class and click on start button
 
    ![img.png](img.png)
 
-2. from cmd
+3. from cmd
 
    navigate to the project directory from cmd
 
