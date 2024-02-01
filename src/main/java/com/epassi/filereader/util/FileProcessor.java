@@ -23,18 +23,18 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 public class FileProcessor {
-    Cache<CacheIndex, JSONObject> cache = Caffeine.newBuilder().build();
+    Cache<String, JSONObject> cache = Caffeine.newBuilder().build();
     private final Pattern CAPTURE_WORDS_REGEX = Pattern.compile("[^a-zA-Z]");
 
     public JSONObject processFile(int k, String fileNameWithPath) {
         String fileChecksum = getChecksumOfFile(fileNameWithPath);
-        CacheIndex cacheIndex = new CacheIndex(fileChecksum, k);
+        String cacheIndex = fileChecksum.concat("_").concat(String.valueOf(k));
         JSONObject ifPresent = cache.getIfPresent(cacheIndex);
         log.info("processFile : read file start {} {} fromCache {}", fileNameWithPath, k, ifPresent);
         return ifPresent != null ? ifPresent : processFileContinue(k, fileNameWithPath, cacheIndex);
     }
 
-    private JSONObject processFileContinue(int k, String fileNameWithPath, CacheIndex cacheIndex) {
+    private JSONObject processFileContinue(int k, String fileNameWithPath, String cacheIndex) {
         Map<String, Integer> countMap = new HashMap<>();
         try (BufferedReader br = Files.newBufferedReader(Paths.get(fileNameWithPath))) {
             br.lines()
