@@ -44,7 +44,7 @@ Spring Boot 3.2.2
    2. run the cmd -> mvn clean install
    
 3. test cases
-   1. countWordsForValidUrl_smallFile_receivedResultIsCorrect
+   1. countWordsForValidUrl_smallFile_withContent_receivedResultIsCorrect
       1. sample file stored in google drive
       2. correct response json stored in sample_1_response.json
       
@@ -56,9 +56,14 @@ Spring Boot 3.2.2
    3. countWordsForValidUrl_smallFile_withoutContent_receivedResultIsCorrect
       1. sample file stored in google drive
       2. correct response json stored in sample_3_response.json
+      
+   4. countWordsForValidUrl_smallFile_withContent_frequentWordCountLargerThanAvailable_receivedResultIsCorrect
+      1. this will check when requested word count larger than available word count scenario
    
 # Documentation
 http://localhost:8080/swagger-ui/index.html
+
+![img_3.png](img_3.png)
 
 # Processing Method
 1. Validations
@@ -81,3 +86,4 @@ http://localhost:8080/swagger-ui/index.html
 
 1. Background file processing for large files
 2. Implement user authentication and authorization
+3. File type validation to only process text files

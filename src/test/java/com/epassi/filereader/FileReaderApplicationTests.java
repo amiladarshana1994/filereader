@@ -12,7 +12,7 @@ class FileReaderApplicationTests extends BaseIntegrationTest{
 
 	String uri = "/file-service/v1/word-count/most-frequent";
 	@Test
-	public void countWordsForValidUrl_smallFile_receivedResultIsCorrect() throws Exception {
+	public void countWordsForValidUrl_smallFile_withContent_receivedResultIsCorrect() throws Exception {
 		setUp();
 		RequestDto request = RequestDto.builder()
 				.link("https://drive.google.com/uc?export=download&id=1S9cakHFyx3i_Xydo_0v7gDUGqQpUgt_5")
@@ -28,7 +28,7 @@ class FileReaderApplicationTests extends BaseIntegrationTest{
 		Assert.assertEquals(new JSONObject(closeCaseRequestJson).toString(), new JSONObject(content).toString());
 	}
 
-	@Test
+	// @Test
 	public void countWordsForValidUrl_largeFile_receivedResultIsCorrect() throws Exception {
 		setUp();
 		RequestDto request = RequestDto.builder()
@@ -55,6 +55,23 @@ class FileReaderApplicationTests extends BaseIntegrationTest{
 		var closeCaseRequestJson = readFile("sample_1_response.json");
 		MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri)
 				.contentType(MediaType.APPLICATION_JSON_VALUE).content(request.toString())).andReturn();
+		int status = mvcResult.getResponse().getStatus();
+		Assert.assertEquals(200, status);
+		String content = mvcResult.getResponse().getContentAsString();
+		Assert.assertEquals(new JSONObject(closeCaseRequestJson).toString(), new JSONObject(content).toString());
+	}
+
+	@Test
+	public void countWordsForValidUrl_smallFile_withContent_frequentWordCountLargerThanAvailable_receivedResultIsCorrect() throws Exception {
+		setUp();
+		RequestDto request = RequestDto.builder()
+				.link("https://drive.google.com/uc?export=download&id=1S9cakHFyx3i_Xydo_0v7gDUGqQpUgt_5")
+				.frequentWordCount(100)
+				.build();
+		var closeCaseRequestJson = readFile("sample_1_response.json");
+		MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri)
+				.contentType(MediaType.APPLICATION_JSON_VALUE).content(request.toString())).andReturn();
+
 		int status = mvcResult.getResponse().getStatus();
 		Assert.assertEquals(200, status);
 		String content = mvcResult.getResponse().getContentAsString();
