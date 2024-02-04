@@ -1,5 +1,6 @@
 package com.epassi.filereader;
 
+import com.epassi.filereader.auth.dto.LoginDto;
 import com.epassi.filereader.dto.RequestDto;
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -11,6 +12,15 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 class FileReaderApplicationTests extends BaseIntegrationTest{
 
 	String uri = "/file-service/v1/word-count/most-frequent";
+	String authUri = "/auth-service/v1/token";
+	private String getToken(String userName, String pwd) throws Exception {
+		LoginDto loginDto = new LoginDto(userName, pwd);
+		MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post(authUri)
+				.contentType(MediaType.APPLICATION_JSON_VALUE).content(loginDto.toString())).andReturn();
+		String content = mvcResult.getResponse().getContentAsString();
+		return new JSONObject(content).getString("accessToken");
+	}
+
 	@Test
 	public void countWordsForValidUrl_smallFile_withContent_receivedResultIsCorrect() throws Exception {
 		setUp();
@@ -20,7 +30,10 @@ class FileReaderApplicationTests extends BaseIntegrationTest{
 				.build();
 		var closeCaseRequestJson = readFile("sample_1_response.json");
 		MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri)
-				.contentType(MediaType.APPLICATION_JSON_VALUE).content(request.toString())).andReturn();
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", "Bearer ".concat(getToken("amila", "1234")))
+				.content(request.toString()))
+				.andReturn();
 
 		int status = mvcResult.getResponse().getStatus();
 		Assert.assertEquals(200, status);
@@ -37,7 +50,9 @@ class FileReaderApplicationTests extends BaseIntegrationTest{
 				.build();
 		var closeCaseRequestJson = readFile("sample_2_response.json");
 		MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri)
-				.contentType(MediaType.APPLICATION_JSON_VALUE).content(request.toString())).andReturn();
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", "Bearer ".concat(getToken("amila", "1234")))
+				.content(request.toString())).andReturn();
 
 		int status = mvcResult.getResponse().getStatus();
 		Assert.assertEquals(200, status);
@@ -54,7 +69,9 @@ class FileReaderApplicationTests extends BaseIntegrationTest{
 				.build();
 		var closeCaseRequestJson = readFile("sample_1_response.json");
 		MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri)
-				.contentType(MediaType.APPLICATION_JSON_VALUE).content(request.toString())).andReturn();
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", "Bearer ".concat(getToken("amila", "1234")))
+				.content(request.toString())).andReturn();
 		int status = mvcResult.getResponse().getStatus();
 		Assert.assertEquals(200, status);
 		String content = mvcResult.getResponse().getContentAsString();
@@ -70,7 +87,9 @@ class FileReaderApplicationTests extends BaseIntegrationTest{
 				.build();
 		var closeCaseRequestJson = readFile("sample_1_response.json");
 		MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post(uri)
-				.contentType(MediaType.APPLICATION_JSON_VALUE).content(request.toString())).andReturn();
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", "Bearer ".concat(getToken("amila", "1234")))
+				.content(request.toString())).andReturn();
 
 		int status = mvcResult.getResponse().getStatus();
 		Assert.assertEquals(200, status);

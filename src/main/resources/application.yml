@@ -1,0 +1,4 @@
+security:
+  jwt:
+    token:
+      secret-key: R5ABc5qD4oEEMmzbglBSPEY4CAKQE6Y2
